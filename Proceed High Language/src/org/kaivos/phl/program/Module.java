@@ -1,25 +1,28 @@
 package org.kaivos.phl.program;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
-import org.kaivos.phl.program.exception.RegistrationException;
+import org.kaivos.phl.program.util.Registry;
 
-public class Module implements Scope {
+public class Module implements VariableScope, InterfaceScope {
 
-	private Map<String, Function> functions = new HashMap<>();
+	private Registry<Function, VariableScope> functions = new Registry<>(this, "function");
+	private Registry<Interface, InterfaceScope> interfaces = new Registry<>(this, "interface");
 	
 	public void registerFunction(Function f) {
-		if (functions.containsKey(f.getName()))
-			throw new RegistrationException("function " + f.getName());
-		
-		f.parent = this;
-		functions.put(f.getName(), f);
+		functions.register(f);
+	}
+	
+	public void registerInterface(Interface i) {
+		interfaces.register(i);
 	}
 	
 	public Optional<Function> resolveFunction(String name) {
-		return Optional.ofNullable(functions.get(name));
+		return functions.resolve(name);
+	}
+	
+	public Optional<Interface> resolveInterface(String name) {
+		return interfaces.resolve(name);
 	}
 	
 }

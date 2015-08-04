@@ -1,5 +1,5 @@
 package org.kaivos.phl.program;
 
-public interface Scope {
+public interface VariableScope {
 
 }

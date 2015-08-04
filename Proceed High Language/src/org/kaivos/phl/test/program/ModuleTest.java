@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.kaivos.phl.program.Function;
+import org.kaivos.phl.program.Interface;
 import org.kaivos.phl.program.Module;
 import org.kaivos.phl.program.exception.RegistrationException;
 
@@ -37,8 +38,40 @@ public class ModuleTest {
 			throwsError = true;
 		}
 		
-		assertTrue("duplicate function throws an exception", throwsError);
+		assertTrue("duplicate function doesn't throw an exception", throwsError);
 		assertEquals(f, m.resolveFunction("f2").orElse(null));
+	}
+	
+	@Test
+	public void testAddingMultipleInterfaces() {
+		Module m = new Module();
+		Interface i1 = new Interface("i1");
+		Interface i2 = new Interface("i2");
+		Interface i3 = new Interface("i3");
+		m.registerInterface(i1);
+		m.registerInterface(i2);
+		m.registerInterface(i3);
+		assertEquals(i1, m.resolveInterface("i1").orElse(null));
+		assertEquals(i2, m.resolveInterface("i2").orElse(null));
+		assertEquals(i3, m.resolveInterface("i3").orElse(null));
+	}
+	
+	@Test
+	public void testDuplicateInterfaces() {
+		Module m = new Module();
+		Interface i;
+		m.registerInterface(new Interface("f1"));
+		m.registerInterface(i = new Interface("f2"));
+		
+		boolean throwsError = false;
+		try {
+			m.registerInterface(new Interface("f2"));
+		} catch (RegistrationException ex) {
+			throwsError = true;
+		}
+		
+		assertTrue("duplicate interface doesn't throw an exception", throwsError);
+		assertEquals(i, m.resolveInterface("f2").orElse(null));
 	}
 
 }
