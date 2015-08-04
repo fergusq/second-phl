@@ -1,12 +1,12 @@
 package org.kaivos.phl.program.exception;
 
-public class ValitationException extends RuntimeException {
+public class ValidationException extends RuntimeException {
 
 	private static final long serialVersionUID = 8454072740441894746L;
 	
 	private String name;
 	
-	public ValitationException(String name) {
+	public ValidationException(String name) {
 		this.name = name;
 	}
 	
