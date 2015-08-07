@@ -9,16 +9,67 @@ import org.kaivos.phl.program.util.NamedChild;
 import org.kaivos.phl.program.util.Registry;
 import org.kaivos.phl.util.Version;
 
-public class Module implements VariableScope, InterfaceScope, NamedChild<ModuleScope> {
+public class Module implements VariableScope, InterfaceScope, NamedChild<Module.Signature, ModuleScope> {
 
-	private Registry<Function, VariableScope> functions = new Registry<>(this, "function");
-	private Registry<Interface, InterfaceScope> interfaces = new Registry<>(this, "interface");
+	public static abstract class Signature {
+		public abstract String getName();
+		public abstract Version getVersion();
+		
+		@Override
+		public boolean equals(Object obj) {
+			return obj instanceof Signature
+					&& ((Signature) obj).getName().equals(getName())
+					&& ((Signature) obj).getVersion().equals(getVersion());
+		}
+		
+		public boolean isCompatible(Signature s) {
+			return s.getName().equals(getName()) && s.getVersion().isCompatible(getVersion());
+		}
+		
+		@Override
+		public int hashCode() {
+			return getName().hashCode() * 7 + getVersion().hashCode();
+		}
+	}
+	
+	public static class SignatureImpl extends Signature {
+		private String name;
+		private Version version;
+		
+		public SignatureImpl(String name, Version version) {
+			this.name = name;
+			this.version = version;
+		}
+		
+		@Override
+		public String getName() {
+			return name;
+		}
+		
+		@Override
+		public Version getVersion() {
+			return version;
+		}
+	}
+	
+	private class PrivateSignatureImpl extends Signature {
+		public String getName() {
+			return name;
+		}
+		public Version getVersion() {
+			return version;
+		}
+	}
+	
+	private Registry<Function.Signature, Function, VariableScope> functions = new Registry<>(this, "function");
+	private Registry<String, Interface, InterfaceScope> interfaces = new Registry<>(this, "interface");
 	private ModuleScope parent;
 	private String name;
+	private Version version;
 	
 	private List<ModuleReference> imports = new ArrayList<>(); 
 	
-	private Version version;
+	private final Signature signature = new PrivateSignatureImpl();
 	
 	public Module(String name) {
 		this(name, Version.of(1, 0, 0));
@@ -38,7 +89,7 @@ public class Module implements VariableScope, InterfaceScope, NamedChild<ModuleS
 	}
 	
 	public Optional<Function> resolveFunction(String name) {
-		Optional<Function> f = functions.resolve(name);
+		Optional<Function> f = functions.resolve(new Function.SignatureImpl(name));
 		if (f.isPresent()) return f;
 		for (ModuleReference imp : imports) {
 			f = imp.getReferencedModule().resolveFunction(name);
@@ -68,8 +119,8 @@ public class Module implements VariableScope, InterfaceScope, NamedChild<ModuleS
 	}
 
 	@Override
-	public String getName() {
-		return name;
+	public Module.Signature getSignature() {
+		return signature;
 	}
 	
 	public Version getVersion() {

@@ -1,7 +1,7 @@
 package org.kaivos.phl.program.util;
 
-public interface NamedChild<T> extends Child<T> {
+public interface NamedChild<T, U> extends Child<U> {
 
-	public String getName();
+	public T getSignature();
 	
 }

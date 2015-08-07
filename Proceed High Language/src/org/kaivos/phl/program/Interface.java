@@ -8,11 +8,11 @@ import org.kaivos.phl.program.reference.TypeReference;
 import org.kaivos.phl.program.util.NamedChild;
 import org.kaivos.phl.program.util.Registry;
 
-public class Interface implements NamedChild<InterfaceScope>, InterfaceScope {
+public class Interface implements NamedChild<String, InterfaceScope>, InterfaceScope {
 
 	private String name;
 	private InterfaceScope parent;
-	private Registry<Interface, InterfaceScope> subinterfaces = new Registry<>(this, "interface");
+	private Registry<String, Interface, InterfaceScope> subinterfaces = new Registry<>(this, "interface");
 	
 	private Set<InterfaceInstance> knownInstances = new HashSet<>();
 	
@@ -32,7 +32,7 @@ public class Interface implements NamedChild<InterfaceScope>, InterfaceScope {
 	}
 	
 	@Override
-	public String getName() {
+	public String getSignature() {
 		return name;
 	}
 
