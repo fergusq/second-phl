@@ -26,4 +26,8 @@ public class Function implements NamedChild<VariableScope> {
 		return parent;
 	}
 	
+	public void validate() {
+		
+	}
+	
 }

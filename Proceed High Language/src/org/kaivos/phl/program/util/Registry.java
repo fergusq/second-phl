@@ -1,5 +1,6 @@
 package org.kaivos.phl.program.util;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -16,15 +17,19 @@ public class Registry<T extends NamedChild<U>, U> {
 		this.typeOfObjects = typeOfObjects;
 	}
 	
-	public void register(T f) {
-		if (registry.containsKey(f.getName()))
-			throw new RegistrationException(typeOfObjects + " " + f.getName());
+	public void register(T t) {
+		if (registry.containsKey(t.getName()))
+			throw new RegistrationException(typeOfObjects + " " + t.getName());
 		
-		f.setParent(parent);
-		registry.put(f.getName(), f);
+		t.setParent(parent);
+		registry.put(t.getName(), t);
 	}
 	
 	public Optional<T> resolve(String name) {
 		return Optional.ofNullable(registry.get(name));
+	}
+	
+	public Collection<T> toCollection() {
+		return registry.values();
 	}
 }

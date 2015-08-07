@@ -11,7 +11,7 @@ public class TypeReferenceTest {
 
 	@Test
 	public void testSimpleNameResolvation() {
-		Module m = new Module();
+		Module m = new Module("m");
 		Interface i = new Interface("i1");
 		m.registerInterface(i);
 		TypeReference tr = new TypeReference("i1", m);
@@ -20,7 +20,7 @@ public class TypeReferenceTest {
 	
 	@Test
 	public void testCompoundNameResolvation() {
-		Module m = new Module();
+		Module m = new Module("m");
 		
 		Interface i1 = new Interface("i1");
 		m.registerInterface(i1);
