@@ -1,8 +1,10 @@
 package org.kaivos.phl.program;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.kaivos.phl.program.reference.ModuleReference;
 import org.kaivos.phl.program.util.NamedChild;
@@ -67,7 +69,7 @@ public class Module implements VariableScope, InterfaceScope, NamedChild<Module.
 	private String name;
 	private Version version;
 	
-	private List<ModuleReference> imports = new ArrayList<>(); 
+	private Set<ModuleReference> imports = new HashSet<>(); 
 	
 	private final Signature signature = new PrivateSignatureImpl();
 	
@@ -78,6 +80,10 @@ public class Module implements VariableScope, InterfaceScope, NamedChild<Module.
 	public Module(String name, Version version) {
 		this.name = name;
 		this.version = version;
+	}
+	
+	public void registerImport(ModuleReference reference) {
+		imports.add(reference);
 	}
 	
 	public void registerFunction(Function f) {

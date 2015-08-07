@@ -1,8 +1,10 @@
-package org.kaivos.phl.program;
+package org.kaivos.phl.test.program;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.kaivos.phl.program.Module;
+import org.kaivos.phl.program.Program;
 import org.kaivos.phl.util.Version;
 
 public class ProgramTest {

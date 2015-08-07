@@ -35,4 +35,16 @@ public class ModuleReference {
 		
 		return scope.resolveModule(name).orElseThrow(exception);
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof ModuleReference
+				&& ((ModuleReference) obj).name.equals(name)
+				&& ((ModuleReference) obj).version.equals(version);
+	}
+	
+	@Override
+	public int hashCode() {
+		return name.hashCode() + 7 * version.hashCode();
+	}
 }

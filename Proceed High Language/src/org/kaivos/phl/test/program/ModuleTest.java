@@ -6,7 +6,9 @@ import org.junit.Test;
 import org.kaivos.phl.program.Function;
 import org.kaivos.phl.program.Interface;
 import org.kaivos.phl.program.Module;
+import org.kaivos.phl.program.Program;
 import org.kaivos.phl.program.exception.RegistrationException;
+import org.kaivos.phl.program.reference.ModuleReference;
 
 public class ModuleTest {
 
@@ -72,6 +74,19 @@ public class ModuleTest {
 		
 		assertTrue("duplicate interface doesn't throw an exception", throwsError);
 		assertEquals(i, m.resolveInterface("f2").orElse(null));
+	}
+	
+	@Test
+	public void testImports() {
+		Program p = new Program();
+		Module m = new Module("m");
+		Module n = new Module("n");
+		Interface i = new Interface("i");
+		p.registerModule(m);
+		p.registerModule(n);
+		n.registerInterface(i);
+		m.registerImport(new ModuleReference("n", p));
+		assertEquals(i, m.resolveInterface("i").orElse(null));
 	}
 
 }
