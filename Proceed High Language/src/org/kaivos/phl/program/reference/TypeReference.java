@@ -1,4 +1,4 @@
-package org.kaivos.phl.program.type;
+package org.kaivos.phl.program.reference;
 
 import org.kaivos.phl.program.Interface;
 import org.kaivos.phl.program.InterfaceInstance;

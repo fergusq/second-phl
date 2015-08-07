@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.kaivos.phl.program.Interface;
 import org.kaivos.phl.program.Module;
-import org.kaivos.phl.program.type.TypeReference;
+import org.kaivos.phl.program.reference.TypeReference;
 
 public class TypeReferenceTest {
 

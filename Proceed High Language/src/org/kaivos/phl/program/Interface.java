@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.kaivos.phl.program.type.TypeReference;
+import org.kaivos.phl.program.reference.TypeReference;
 import org.kaivos.phl.program.util.NamedChild;
 import org.kaivos.phl.program.util.Registry;
 
