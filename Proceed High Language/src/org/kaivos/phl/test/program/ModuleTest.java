@@ -9,15 +9,26 @@ import org.kaivos.phl.program.Module;
 import org.kaivos.phl.program.Program;
 import org.kaivos.phl.program.exception.RegistrationException;
 import org.kaivos.phl.program.reference.ModuleReference;
+import org.kaivos.phl.program.reference.TypeReference;
 
 public class ModuleTest {
 
+	private TypeReference voidTypeWithin(Module m) {
+		return new TypeReference(false, "void", m);
+	}
+	
+	private Module prepareModule(String name) {
+		Module m = new Module(name);
+		m.registerInterface(new Interface("Void"));
+		return m;
+	}
+	
 	@Test
 	public void testAddingMultipleFunctions() {
-		Module m = new Module("m");
-		Function f1 = new Function("f1");
-		Function f2 = new Function("f2");
-		Function f3 = new Function("f3");
+		Module m = prepareModule("m");
+		Function f1 = new Function("f1", voidTypeWithin(m));
+		Function f2 = new Function("f2", voidTypeWithin(m));
+		Function f3 = new Function("f3", voidTypeWithin(m));
 		m.registerFunction(f1);
 		m.registerFunction(f2);
 		m.registerFunction(f3);
@@ -28,14 +39,14 @@ public class ModuleTest {
 	
 	@Test
 	public void testDuplicateFunctions() {
-		Module m = new Module("m");
+		Module m = prepareModule("m");
 		Function f;
-		m.registerFunction(new Function("f1"));
-		m.registerFunction(f = new Function("f2"));
+		m.registerFunction(new Function("f1", voidTypeWithin(m)));
+		m.registerFunction(f = new Function("f2", voidTypeWithin(m)));
 		
 		boolean throwsError = false;
 		try {
-			m.registerFunction(new Function("f2"));
+			m.registerFunction(new Function("f2", voidTypeWithin(m)));
 		} catch (RegistrationException ex) {
 			throwsError = true;
 		}
@@ -46,7 +57,7 @@ public class ModuleTest {
 	
 	@Test
 	public void testAddingMultipleInterfaces() {
-		Module m = new Module("m");
+		Module m = prepareModule("m");
 		Interface i1 = new Interface("i1");
 		Interface i2 = new Interface("i2");
 		Interface i3 = new Interface("i3");
@@ -60,7 +71,7 @@ public class ModuleTest {
 	
 	@Test
 	public void testDuplicateInterfaces() {
-		Module m = new Module("m");
+		Module m = prepareModule("m");
 		Interface i;
 		m.registerInterface(new Interface("f1"));
 		m.registerInterface(i = new Interface("f2"));
@@ -79,8 +90,8 @@ public class ModuleTest {
 	@Test
 	public void testImports() {
 		Program p = new Program();
-		Module m = new Module("m");
-		Module n = new Module("n");
+		Module m = prepareModule("m");
+		Module n = prepareModule("n");
 		Interface i = new Interface("i");
 		p.registerModule(m);
 		p.registerModule(n);

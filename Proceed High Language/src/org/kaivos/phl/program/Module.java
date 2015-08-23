@@ -1,8 +1,6 @@
 package org.kaivos.phl.program;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -82,6 +80,12 @@ public class Module implements VariableScope, InterfaceScope, NamedChild<Module.
 		this.version = version;
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		// there should be no duplicates
+		return this == obj;
+	}
+	
 	public void registerImport(ModuleReference reference) {
 		imports.add(reference);
 	}
@@ -101,7 +105,7 @@ public class Module implements VariableScope, InterfaceScope, NamedChild<Module.
 			f = imp.getReferencedModule().resolveFunction(name);
 			if (f.isPresent()) return f;
 		}
-		return Optional.<Function>empty();
+		return Optional.empty();
 	}
 	
 	public Optional<Interface> resolveInterface(String name) {
@@ -111,7 +115,7 @@ public class Module implements VariableScope, InterfaceScope, NamedChild<Module.
 			i = imp.getReferencedModule().resolveInterface(name);
 			if (i.isPresent()) return i;
 		}
-		return Optional.<Interface>empty();
+		return Optional.empty();
 	}
 
 	@Override

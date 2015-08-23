@@ -1,5 +1,11 @@
 package org.kaivos.phl.program;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.kaivos.phl.program.reference.TypeReference;
+import org.kaivos.phl.program.reference.TypeparameterSubstitutions;
 import org.kaivos.phl.program.util.NamedChild;
 
 public class Function implements NamedChild<Function.Signature, VariableScope> {
@@ -40,12 +46,36 @@ public class Function implements NamedChild<Function.Signature, VariableScope> {
 	}
 	
 	private String name;
+	private TypeReference returnType;
+	private Variable[] parameters;
 	VariableScope parent;
 	
 	private final Signature signature = new PrivateSignatureImpl();
 	
-	public Function(String name) {
+	private Set<FunctionInstance> knownInstances = new HashSet<>();
+	
+	public Function(String name, TypeReference returnType, Variable... parameters) {
 		this.name = name;
+		this.returnType = returnType;
+		this.parameters = parameters;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		// no duplicates allowed
+		return this == obj;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public Variable[] getParameters() {
+		return parameters;
+	}
+	
+	public TypeReference getReturnType() {
+		return returnType;
 	}
 
 	@Override
@@ -64,7 +94,57 @@ public class Function implements NamedChild<Function.Signature, VariableScope> {
 	}
 	
 	public void validate() {
+		returnType.validate();
+		for (Variable var : parameters) var.validate();
+	}
+	
+	public FunctionInstance getInstance(Map<String, TypeReference> typearguments) {
+		FunctionInstance fi = new FunctionInstanceImpl(typearguments);
+		knownInstances.add(fi);
+		return fi;
+	}
+	
+	private class FunctionInstanceImpl implements FunctionInstance {
+		private TypeparameterSubstitutions substitutions;
+		private InterfaceInstance returnType;
+		private VariableInstance[] parameters;
 		
+		public FunctionInstanceImpl(Map<String, TypeReference> typearguments) {
+			substitutions = new TypeparameterSubstitutions(typearguments);
+			returnType = getFunction().getReturnType().getReferencedInterfaceInstance(substitutions);
+			parameters = new VariableInstance[getFunction().getParameters().length];
+			for (int i = 0; i < parameters.length; i++) parameters[i] = getFunction().getParameters()[i].getInstance(substitutions);
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (!(obj instanceof FunctionInstanceImpl)) return false;
+			FunctionInstanceImpl fii = (FunctionInstanceImpl) obj;
+			
+			if (!fii.substitutions.equals(substitutions)) return false;
+			
+			return fii.getFunction().equals(getFunction());
+		}
+		
+		@Override
+		public Function getFunction() {
+			return Function.this;
+		}
+
+		@Override
+		public String getName() {
+			return getFunction().getName();
+		}
+
+		@Override
+		public VariableInstance[] getParameters() {
+			return parameters;
+		}
+
+		@Override
+		public InterfaceInstance getReturnType() {
+			return returnType;
+		}
 	}
 	
 }

@@ -1,5 +1,10 @@
 package org.kaivos.phl.program.reference;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import org.kaivos.phl.program.Interface;
 import org.kaivos.phl.program.InterfaceInstance;
 import org.kaivos.phl.program.InterfaceScope;
@@ -9,34 +14,44 @@ import org.kaivos.phl.program.exception.ResolvationException;
 import static org.kaivos.phl.util.Assert.nonEmpty;
 
 public class TypeReference {
-
+	
+	private boolean typeparameter;
+	
 	private String[] referenceIdChain;
-	private TypeReference[] typearguments;
+	private Map<String, TypeReference> typearguments;
 	private Interface referencedInterface;
-	private InterfaceScope environment;
+	private Module environment;
 	
-	public TypeReference(String id, Module environment) {
-		this(new String[] { id }, new TypeReference[0], environment);
+	public TypeReference(boolean isTypeparameter, String id, Module environment) {
+		this(isTypeparameter, new String[] { id }, Collections.emptyMap(), environment);
 	}
 	
-	public TypeReference(String id, TypeReference[] typearguments, Module environment) {
-		this(new String[] { id }, typearguments, environment);
+	public TypeReference(boolean isTypeparameter, String id, Map<String, TypeReference> typearguments, Module environment) {
+		this(isTypeparameter, new String[] { id }, typearguments, environment);
 	}
 	
-	public TypeReference(String[] idChain, Module environment) {
-		this(idChain, new TypeReference[0], environment);
+	public TypeReference(boolean isTypeparameter, String[] idChain, Module environment) {
+		this(isTypeparameter, idChain, Collections.emptyMap(), environment);
 	}
 	
-	public TypeReference(String[] idChain, TypeReference[] typearguments, Module environment) {
+	public TypeReference(boolean isTypeparameter, String[] idChain, Map<String, TypeReference> typearguments, Module environment) {
 		nonEmpty(idChain);
 		
+		if (isTypeparameter && (idChain.length != 1 || typearguments.size() > 0))
+			throw new IllegalArgumentException();
+		
+		this.typeparameter = isTypeparameter;
 		this.referenceIdChain = idChain;
 		this.typearguments = typearguments;
 		this.environment = environment;
 	}
 	
+	public boolean isTypeparameter() {
+		return typeparameter;
+	}
+	
 	public void validate() {
-		if (referencedInterface == null)
+		if (!isTypeparameter() && referencedInterface == null)
 			resolveReference();
 	}
 
@@ -49,15 +64,41 @@ public class TypeReference {
 		referencedInterface = (Interface) env;
 	}
 	
-	public Interface getReferencedInterface() {
+	public Optional<Interface> getReferencedInterface() {
+		if (isTypeparameter()) return Optional.empty();
+		
 		if (referencedInterface == null)
 			resolveReference();
 		
-		return referencedInterface;
+		return Optional.of(referencedInterface);
 	}
 	
-	public InterfaceInstance getReferencedInterfaceInstance() {
-		return getReferencedInterface().getInstance(typearguments);
+	public InterfaceInstance getReferencedInterfaceInstance(TypeparameterSubstitutions substitutions) {
+		if (isTypeparameter())
+			return substitutions.substitute(referenceIdChain[0]).orElseThrow(() -> new ResolvationException("interface ?" + referenceIdChain[0])).getReferencedInterfaceInstanceWithoutSubstitutions();
+		
+		Map<String, TypeReference> ta = substituteTypearguments(substitutions);
+		
+		return getReferencedInterface().get().getInstance(ta);
+	}
+	
+	private Map<String, TypeReference> substituteTypearguments(
+			TypeparameterSubstitutions substitutions) {
+		Map<String, TypeReference> tr = new HashMap<>();
+		
+		for (String key : tr.keySet()) {
+			final TypeReference typeargument = typearguments.get(key);
+			if (typeargument.isTypeparameter())
+				tr.put(key, substitutions.substitute(typeargument.referenceIdChain[0]).orElseThrow(() -> new ResolvationException("interface ?" + typeargument.referenceIdChain[0])));
+			else
+				tr.put(key, new TypeReference(false, typeargument.referenceIdChain, typeargument.substituteTypearguments(substitutions), typeargument.environment));
+		}
+		
+		return tr;
+	}
+
+	private InterfaceInstance getReferencedInterfaceInstanceWithoutSubstitutions() {
+		return getReferencedInterface().get().getInstance(typearguments);
 	}
 	
 }

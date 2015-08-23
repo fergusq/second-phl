@@ -1,6 +1,7 @@
 package org.kaivos.phl.program;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -16,8 +17,11 @@ public class Interface implements NamedChild<String, InterfaceScope>, InterfaceS
 	
 	private Set<InterfaceInstance> knownInstances = new HashSet<>();
 	
-	public Interface(String name) {
+	private Typeparameter[] typeparameters;
+	
+	public Interface(String name, Typeparameter... typeparameters) {
 		this.name = name;
+		this.typeparameters = typeparameters;
 	}
 	
 	@Override
@@ -29,6 +33,10 @@ public class Interface implements NamedChild<String, InterfaceScope>, InterfaceS
 	@Override
 	public int hashCode() {
 		return name.hashCode();
+	}
+	
+	public Typeparameter[] getTypeparameters() {
+		return typeparameters;
 	}
 	
 	@Override
@@ -60,16 +68,16 @@ public class Interface implements NamedChild<String, InterfaceScope>, InterfaceS
 		
 	}
 	
-	public InterfaceInstance getInstance(TypeReference... typearguments) {
+	public InterfaceInstance getInstance(Map<String, TypeReference> typearguments) {
 		InterfaceInstance ii = new InterfaceInstanceImpl(typearguments);
 		knownInstances.add(ii);
 		return ii;
 	}
 	
 	private class InterfaceInstanceImpl implements InterfaceInstance {
-		private TypeReference[] typearguments;
+		private Map<String, TypeReference> typearguments;
 		
-		public InterfaceInstanceImpl(TypeReference[] typearguments) {
+		public InterfaceInstanceImpl(Map<String, TypeReference> typearguments) {
 			this.typearguments = typearguments;
 		}
 		
@@ -78,15 +86,16 @@ public class Interface implements NamedChild<String, InterfaceScope>, InterfaceS
 			if (!(obj instanceof InterfaceInstanceImpl)) return false;
 			InterfaceInstanceImpl iii = (InterfaceInstanceImpl) obj;
 			
-			if (typearguments.length != iii.typearguments.length) return false;
-			for (int i = 0; i < typearguments.length; i++) {
-				if (!typearguments[i].equals(iii.typearguments[i])) return false;
+			if (typearguments.keySet().size() != iii.typearguments.keySet().size()) return false;
+			for (String key : typearguments.keySet()) {
+				if (!iii.typearguments.containsKey(key) || !typearguments.get(key).equals(iii.typearguments.get(key))) return false;
 			}
 			
 			return iii.getInterface().equals(getInterface());
 		}
 		
-		private Interface getInterface() {
+		@Override
+		public Interface getInterface() {
 			return Interface.this;
 		}
 	}
