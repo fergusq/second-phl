@@ -28,7 +28,7 @@ public class FunctionTest {
 		Interface i = new Interface("I");
 		m.registerInterface(i);
 		
-		Function f = new Function("f", new TypeReference(true, "T", m));
+		Function f = new Function("f", new TypeReference(true, "T", m), new Variable[]{}, new DummyBody());
 		m.registerFunction(f);
 		
 		FunctionInstance fi = f.getInstance(createMap("T", new TypeReference(false, "I", m)));
@@ -45,7 +45,7 @@ public class FunctionTest {
 		Interface j = new Interface("J");
 		m.registerInterface(j);
 		
-		Function f = new Function("f", new TypeReference(false, "J", m), new Variable("v", new TypeReference(true, "T", m)));
+		Function f = new Function("f", new TypeReference(false, "J", m), new Variable[] {new Variable("v", new TypeReference(true, "T", m))}, new DummyBody());
 		m.registerFunction(f);
 		
 		FunctionInstance fi = f.getInstance(createMap("T", new TypeReference(false, "I", m)));

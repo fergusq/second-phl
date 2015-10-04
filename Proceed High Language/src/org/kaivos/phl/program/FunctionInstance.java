@@ -5,4 +5,5 @@ public interface FunctionInstance {
 	public String getName();
 	public VariableInstance[] getParameters();
 	public InterfaceInstance getReturnType();
+	public FunctionBodyInstance getBody();
 }

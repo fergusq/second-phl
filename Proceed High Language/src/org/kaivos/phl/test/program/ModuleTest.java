@@ -7,6 +7,7 @@ import org.kaivos.phl.program.Function;
 import org.kaivos.phl.program.Interface;
 import org.kaivos.phl.program.Module;
 import org.kaivos.phl.program.Program;
+import org.kaivos.phl.program.Variable;
 import org.kaivos.phl.program.exception.RegistrationException;
 import org.kaivos.phl.program.reference.ModuleReference;
 import org.kaivos.phl.program.reference.TypeReference;
@@ -14,7 +15,7 @@ import org.kaivos.phl.program.reference.TypeReference;
 public class ModuleTest {
 
 	private TypeReference voidTypeWithin(Module m) {
-		return new TypeReference(false, "void", m);
+		return new TypeReference(false, "VSSoid", m);
 	}
 	
 	private Module prepareModule(String name) {
@@ -26,9 +27,9 @@ public class ModuleTest {
 	@Test
 	public void testAddingMultipleFunctions() {
 		Module m = prepareModule("m");
-		Function f1 = new Function("f1", voidTypeWithin(m));
-		Function f2 = new Function("f2", voidTypeWithin(m));
-		Function f3 = new Function("f3", voidTypeWithin(m));
+		Function f1 = new Function("f1", voidTypeWithin(m), new Variable[]{}, new DummyBody());
+		Function f2 = new Function("f2", voidTypeWithin(m), new Variable[]{}, new DummyBody());
+		Function f3 = new Function("f3", voidTypeWithin(m), new Variable[]{}, new DummyBody());
 		m.registerFunction(f1);
 		m.registerFunction(f2);
 		m.registerFunction(f3);
@@ -41,12 +42,12 @@ public class ModuleTest {
 	public void testDuplicateFunctions() {
 		Module m = prepareModule("m");
 		Function f;
-		m.registerFunction(new Function("f1", voidTypeWithin(m)));
-		m.registerFunction(f = new Function("f2", voidTypeWithin(m)));
+		m.registerFunction(new Function("f1", voidTypeWithin(m), new Variable[]{}, new DummyBody()));
+		m.registerFunction(f = new Function("f2", voidTypeWithin(m), new Variable[]{}, new DummyBody()));
 		
 		boolean throwsError = false;
 		try {
-			m.registerFunction(new Function("f2", voidTypeWithin(m)));
+			m.registerFunction(new Function("f2", voidTypeWithin(m), new Variable[]{}, new DummyBody()));
 		} catch (RegistrationException ex) {
 			throwsError = true;
 		}

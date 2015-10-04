@@ -48,16 +48,19 @@ public class Function implements NamedChild<Function.Signature, VariableScope> {
 	private String name;
 	private TypeReference returnType;
 	private Variable[] parameters;
+	private FunctionBody body;
+	
 	VariableScope parent;
 	
 	private final Signature signature = new PrivateSignatureImpl();
 	
 	private Set<FunctionInstance> knownInstances = new HashSet<>();
 	
-	public Function(String name, TypeReference returnType, Variable... parameters) {
+	public Function(String name, TypeReference returnType, Variable[] parameters, FunctionBody body) {
 		this.name = name;
 		this.returnType = returnType;
 		this.parameters = parameters;
+		this.body = body;
 	}
 	
 	@Override
@@ -76,6 +79,10 @@ public class Function implements NamedChild<Function.Signature, VariableScope> {
 	
 	public TypeReference getReturnType() {
 		return returnType;
+	}
+	
+	public FunctionBody getBody() {
+		return body;
 	}
 
 	@Override
@@ -108,12 +115,14 @@ public class Function implements NamedChild<Function.Signature, VariableScope> {
 		private TypeparameterSubstitutions substitutions;
 		private InterfaceInstance returnType;
 		private VariableInstance[] parameters;
+		private FunctionBodyInstance body;
 		
 		public FunctionInstanceImpl(Map<String, TypeReference> typearguments) {
 			substitutions = new TypeparameterSubstitutions(typearguments);
 			returnType = getFunction().getReturnType().getReferencedInterfaceInstance(substitutions);
 			parameters = new VariableInstance[getFunction().getParameters().length];
 			for (int i = 0; i < parameters.length; i++) parameters[i] = getFunction().getParameters()[i].getInstance(substitutions);
+			body = getFunction().getBody().getInstance(substitutions);
 		}
 		
 		@Override
@@ -144,6 +153,11 @@ public class Function implements NamedChild<Function.Signature, VariableScope> {
 		@Override
 		public InterfaceInstance getReturnType() {
 			return returnType;
+		}
+		
+		@Override
+		public FunctionBodyInstance getBody() {
+			return body;
 		}
 	}
 	

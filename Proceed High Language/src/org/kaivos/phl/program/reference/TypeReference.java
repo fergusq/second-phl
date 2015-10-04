@@ -46,6 +46,10 @@ public class TypeReference {
 		this.environment = environment;
 	}
 	
+	public String getShortName() {
+		return referenceIdChain[referenceIdChain.length-1];
+	}
+	
 	public boolean isTypeparameter() {
 		return typeparameter;
 	}
